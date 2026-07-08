@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Env / secrets
+.env
+*.env
+!.env.example
+secrets/
+*.key
+*.pem
+gee-service-account.json
+
+# Node / frontend
+node_modules/
+web/dist/
+web/.vite/
+
+# Data / artifacts
+data/
+*.tif
+*.tiff
+*.geotiff
+models/*.pt
+models/*.pkl
+!models/.gitkeep
+
+# OS / editor
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

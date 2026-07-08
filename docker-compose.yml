@@ -1,0 +1,145 @@
+# SAMBA local/dev orchestration.
+#
+# One backend image (samba-backend, built from ./api) runs in several roles via
+# different commands: api, worker, inference, training. This mirrors the SRS
+# deployment diagram at single-machine scale and maps onto cloud infra later:
+#
+#   postgis   -> managed Postgres + PostGIS (Cloud SQL / RDS)
+#   minio     -> object storage (GCS / S3)
+#   redis     -> message queue (Cloud Pub/Sub / SQS)
+#   api       -> backend API behind the load balancer's web-server replicas
+#   worker    -> data-processing workers consuming the queue
+#   inference -> ML inference server (decoupled from training)
+#   training  -> ML training server GPU (run on demand; profile "training")
+#
+# The nginx load balancer + 3 API replicas live in infra/ (Phase 6).
+
+services:
+  postgis:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # web console
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # One-shot: ensure the object-storage bucket exists.
+  createbuckets:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
+      mc mb --ignore-existing local/${MINIO_BUCKET} &&
+      echo 'bucket ready';
+      "
+
+  api:
+    build: ./api
+    image: samba-backend
+    env_file: .env
+    command: ["sh", "entrypoint.sh"]
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgis:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  worker:
+    image: samba-backend
+    env_file: .env
+    command: ["python", "-m", "app.workers.worker"]
+    depends_on:
+      api:
+        condition: service_started
+      postgis:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  inference:
+    image: samba-backend
+    env_file: .env
+    command: ["uvicorn", "app.inference.app:app", "--host", "0.0.0.0", "--port", "9000"]
+    ports:
+      - "9002:9000"   # host 9002 -> container 9000 (9000 reserved for MinIO S3)
+    volumes:
+      - modelstore:/models
+    depends_on:
+      api:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:9000/health').status==200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: ./web
+    ports:
+      - "8080:80"
+    depends_on:
+      api:
+        condition: service_started
+
+  # Training server (GPU in cloud). Run on demand:
+  #   docker compose --profile training run --rm training
+  training:
+    image: samba-backend
+    env_file: .env
+    command: ["python", "-m", "app.ml.train"]
+    profiles: ["training"]
+    volumes:
+      - modelstore:/models
+    depends_on:
+      postgis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  miniodata:
+  modelstore:
