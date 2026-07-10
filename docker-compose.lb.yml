@@ -1,0 +1,21 @@
+# Load-balanced overlay: run the API as N replicas behind an nginx load balancer.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.lb.yml up -d --scale api=3
+#
+# The LB owns host port 8000; individual replicas no longer publish a host port
+# (they can't all bind the same one). Confirm distribution with:
+#   for i in 1 2 3 4 5 6; do curl -s localhost:8000/health | jq -r .instance; done
+
+services:
+  api:
+    # Replicas must not bind a host port; the LB is the single ingress.
+    ports: !override []
+
+  lb:
+    image: nginx:alpine
+    volumes:
+      - ./infra/nginx/lb.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8000:80"
+    depends_on:
+      - api
