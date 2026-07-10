@@ -1,0 +1,44 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="Eslint" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="numpy" />
+          <option value="pandas" />
+          <option value="scipy" />
+          <option value="scikit-learn" />
+          <option value="xgboost" />
+          <option value="lightgbm" />
+          <option value="ta" />
+          <option value="pandas-ta" />
+          <option value="vectorbt" />
+          <option value="backtrader" />
+          <option value="yfinance" />
+          <option value="sqlalchemy" />
+          <option value="psycopg2-binary" />
+          <option value="asyncpg" />
+          <option value="matplotlib" />
+          <option value="plotly" />
+          <option value="seaborn" />
+          <option value="jupyterlab" />
+          <option value="ipywidgets" />
+          <option value="python-dotenv" />
+          <option value="loguru" />
+          <option value="tqdm" />
+          <option value="requests" />
+          <option value="pyyaml" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="notebooks.fetch_weekly.*" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="SqlNoDataSourceInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+  </profile>
+</component>
