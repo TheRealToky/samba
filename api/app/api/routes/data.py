@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.processing.alignment import align_region, ndvi_series
-from app.services.data_service import ClimateService, SatelliteService
+from app.services.data_service import ClimateAnalyticsService, ClimateService, SatelliteService
 
 router = APIRouter(tags=["data"])
 
@@ -47,6 +47,18 @@ def query_climate(
     db: Session = Depends(get_db),
 ) -> list[dict]:
     return ClimateService(db).query(region_id=region_id, bbox=_parse_bbox(bbox), start=start, end=end, limit=limit)
+
+
+@router.get("/climate/overview")
+def climate_overview(db: Session = Depends(get_db)) -> list[dict]:
+    """National monthly climate + vegetation trend (temp/rainfall/humidity/NDVI)."""
+    return ClimateAnalyticsService(db).national_monthly()
+
+
+@router.get("/climate/regional")
+def climate_regional(db: Session = Depends(get_db)) -> list[dict]:
+    """Per-region climate averages + NDVI change for cross-region comparison."""
+    return ClimateAnalyticsService(db).regional_summary()
 
 
 @router.get("/regions/{region_id}/ndvi-series")

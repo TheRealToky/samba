@@ -37,7 +37,10 @@ export default function Reports() {
   return (
     <div>
       <div className="section-title">
-        <h1>Environmental Reports</h1>
+        <div>
+          <h1>Environmental Reports</h1>
+          <div className="subtitle">Exportable regional summaries: NDVI change, deforestation status, richness and alerts.</div>
+        </div>
         <div className="row-actions">
           <button className="btn" disabled={busy} onClick={() => generate("csv")}>Export CSV</button>
           <button className="btn" disabled={busy} onClick={() => generate("pdf")}>Export PDF</button>

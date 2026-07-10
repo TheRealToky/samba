@@ -3,8 +3,9 @@ import { useAuth } from "./auth";
 import Layout from "./components/Layout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Biodiversity from "./pages/Biodiversity";
+import Climate from "./pages/Climate";
 import MapView from "./pages/MapView";
-import Trends from "./pages/Trends";
 import Alerts from "./pages/Alerts";
 import Reports from "./pages/Reports";
 import { ReactNode } from "react";
@@ -28,10 +29,13 @@ export default function App() {
         }
       >
         <Route path="/" element={<Dashboard />} />
+        <Route path="/biodiversity" element={<Biodiversity />} />
+        <Route path="/climate" element={<Climate />} />
         <Route path="/map" element={<MapView />} />
-        <Route path="/trends" element={<Trends />} />
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/reports" element={<Reports />} />
+        {/* legacy path */}
+        <Route path="/trends" element={<Navigate to="/climate" replace />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

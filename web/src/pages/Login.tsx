@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
+import { IconLeaf } from "../components/icons";
 
 export default function Login() {
   const { login } = useAuth();
@@ -27,8 +28,11 @@ export default function Login() {
   return (
     <div className="login-wrap">
       <form className="login-card" onSubmit={onSubmit}>
-        <h1>🌿 SAMBA</h1>
-        <p>System for the Administration of Malagasy Biodiversity Assessment</p>
+        <div className="login-brand">
+          <span className="mark"><IconLeaf size={20} /></span>
+          <h1>SAMBA</h1>
+        </div>
+        <p className="tag">Madagascar's environmental intelligence hub — deforestation, climate &amp; biodiversity.</p>
         {error && <div className="error">{error}</div>}
         <div className="field">
           <label>Email</label>

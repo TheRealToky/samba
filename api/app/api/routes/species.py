@@ -25,6 +25,36 @@ def richness(db: Session = Depends(get_db)) -> list[dict]:
     return SpeciesService(db).richness_by_region()
 
 
+@router.get("/top")
+def top_observed(limit: int = 10, db: Session = Depends(get_db)) -> list[dict]:
+    """Most-observed species (leaderboard)."""
+    return SpeciesService(db).top_observed(limit=limit)
+
+
+@router.get("/status-breakdown")
+def status_breakdown(db: Session = Depends(get_db)) -> list[dict]:
+    """Species + observation counts grouped by IUCN conservation status."""
+    return SpeciesService(db).status_breakdown()
+
+
+@router.get("/observation-trend")
+def observation_trend(db: Session = Depends(get_db)) -> list[dict]:
+    """Monthly observation volume, split by data source."""
+    return SpeciesService(db).observation_trend()
+
+
+@router.get("/observations/geojson")
+def observations_geojson(limit: int = 2000, db: Session = Depends(get_db)) -> dict:
+    """Observation points as GeoJSON for the biodiversity map."""
+    return SpeciesService(db).observations_geojson(limit=limit)
+
+
+@router.get("/decline-risk")
+def decline_risk(db: Session = Depends(get_db)) -> list[dict]:
+    """Species observed inside detected deforestation zones (decline watch)."""
+    return SpeciesService(db).decline_risk()
+
+
 @router.get("/{scientific_name}/distribution")
 def distribution(scientific_name: str, db: Session = Depends(get_db)) -> list[dict]:
     return SpeciesService(db).distribution(scientific_name)

@@ -1,10 +1,12 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../auth";
+import { IconLeaf } from "./icons";
 
 const links = [
-  { to: "/", label: "Dashboard", end: true },
+  { to: "/", label: "Overview", end: true },
+  { to: "/biodiversity", label: "Biodiversity" },
+  { to: "/climate", label: "Climate" },
   { to: "/map", label: "Map" },
-  { to: "/trends", label: "Trends" },
   { to: "/alerts", label: "Alerts" },
   { to: "/reports", label: "Reports" },
 ];
@@ -15,8 +17,11 @@ export default function Layout() {
     <div className="app-shell">
       <header className="topbar">
         <div className="brand">
-          <span className="brand-mark">🌿</span> SAMBA
-          <span className="brand-sub">Malagasy Biodiversity Assessment</span>
+          <span className="brand-mark"><IconLeaf size={18} /></span>
+          <span className="brand-text">
+            SAMBA
+            <span className="brand-sub">Madagascar Environmental Hub</span>
+          </span>
         </div>
         <nav className="nav">
           {links.map((l) => (
@@ -36,6 +41,10 @@ export default function Layout() {
       <main className="content">
         <Outlet />
       </main>
+      <footer className="app-footer">
+        <span className="foot-brand">SAMBA</span> · Madagascar's environmental intelligence hub — deforestation,
+        climate &amp; biodiversity. Data: Sentinel/Landsat via Google Earth Engine · GBIF · iNaturalist · NASA POWER.
+      </footer>
     </div>
   );
 }
