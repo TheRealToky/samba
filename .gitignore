@@ -36,3 +36,6 @@ models/*.pkl
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Tooling
+.claude
