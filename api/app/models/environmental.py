@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import datetime
 
 from geoalchemy2 import Geometry
-from sqlalchemy import DateTime, Float, ForeignKey
+from sqlalchemy import DateTime, Float, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin
@@ -17,6 +17,9 @@ from app.models.base import Base, TimestampMixin
 
 class SatelliteData(Base, TimestampMixin):
     __tablename__ = "satellite_data"
+    # One NDVI reading per region per timestamp — lets ingestion upsert instead
+    # of duplicating rows when a date window is re-ingested (live/scheduled runs).
+    __table_args__ = (UniqueConstraint("region_id", "date", name="uq_satellite_data_region_date"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     location = mapped_column(
@@ -32,6 +35,7 @@ class SatelliteData(Base, TimestampMixin):
 
 class ClimateData(Base, TimestampMixin):
     __tablename__ = "climate_data"
+    __table_args__ = (UniqueConstraint("region_id", "date", name="uq_climate_data_region_date"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     location = mapped_column(
