@@ -36,6 +36,11 @@ class Settings(BaseSettings):
     ingestion_mode_biodiversity: str | None = None
     # Max occurrences to pull per region per run in live biodiversity ingestion.
     biodiversity_max_records: int = 500
+    # Live GEE: months computed per getInfo round trip. Each month is one
+    # reduceRegion aggregation, and Earth Engine caps concurrent aggregations per
+    # request ("Too many concurrent aggregations"), so the monthly series is
+    # pulled in batches of this size. Raise it if your project tolerates more.
+    gee_max_months_per_request: int = 6
     # How far back iNaturalist is pulled within the ingestion window. iNaturalist
     # overlaps GBIF's aggregate, so it's clipped to the recent tail to limit
     # double-counting; widen this to broaden community/photo coverage. 0 (or less)

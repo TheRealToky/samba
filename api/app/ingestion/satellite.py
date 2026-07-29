@@ -5,19 +5,28 @@ Live mode derives a scalar mean NDVI per region per month from Sentinel-2 via
 registered GCP project and a service-account key (GEE_* settings); the import is
 lazy so the earthengine-api package is only needed for live mode.
 
-The whole monthly series is computed server-side and pulled in a single
-`getInfo()` round trip (rather than one call per month) to cut latency and stay
-well under Earth Engine's request quotas.
+Each month is one `reduceRegion` aggregation. Earth Engine caps how many
+aggregations a single request may run concurrently ("Too many concurrent
+aggregations"), so the monthly series is pulled in batches of
+`GEE_MAX_MONTHS_PER_REQUEST` months per `getInfo()` (not the whole series at
+once), with exponential-backoff retries for transient throttling.
 """
 from __future__ import annotations
 
 import json
+import time
 from datetime import datetime
 
 from app.config import settings
 from app.ingestion.base import SatelliteRecord
 from app.ingestion.sampling import sample_satellite
 from app.geo.madagascar import bbox_polygon_wkt
+
+# Substrings that mark a retryable Earth Engine condition (throttling/transient).
+_EE_TRANSIENT = (
+    "too many", "concurrent", "timed out", "timeout",
+    "quota", "rate limit", "backend error", "try again", "please retry",
+)
 
 
 class EarthEngineSatelliteProvider:
@@ -44,6 +53,19 @@ class EarthEngineSatelliteProvider:
         ee.Initialize(creds, project=settings.gee_project or None)
         self._ee = ee
         return ee
+
+    def _get_info(self, obj, attempts: int = 5):
+        """`obj.getInfo()` with exponential backoff on transient EE errors."""
+        delay = 2.0
+        for attempt in range(1, attempts + 1):
+            try:
+                return obj.getInfo()
+            except Exception as exc:  # ee.EEException and friends
+                transient = any(s in str(exc).lower() for s in _EE_TRANSIENT)
+                if attempt == attempts or not transient:
+                    raise
+                time.sleep(delay)
+                delay *= 2
 
     def _fetch_live(self, region: dict, start: datetime, end: datetime) -> list[SatelliteRecord]:
         bbox = region.get("bbox")
@@ -73,16 +95,19 @@ class EarthEngineSatelliteProvider:
             ).get("NDVI")
             return ee.Feature(None, {"date": d0.format("YYYY-MM-dd"), "ndvi": mean})
 
-        months = ee.List.sequence(0, n_months - 1)
-        fc = ee.FeatureCollection(months.map(monthly_feature))
-        data = fc.getInfo()  # single round trip for the whole series
-
+        # Pull the series in month-batches so each getInfo triggers only a handful
+        # of concurrent reduceRegion aggregations (see module docstring).
+        batch = max(1, settings.gee_max_months_per_request)
         records: list[SatelliteRecord] = []
-        for feat in data.get("features", []):
-            props = feat.get("properties", {})
-            ndvi = props.get("ndvi")
-            if ndvi is None:  # fully-clouded / empty month
-                continue
-            d = datetime.strptime(props["date"], "%Y-%m-%d").replace(tzinfo=start.tzinfo)
-            records.append(SatelliteRecord(date=d, ndvi=round(float(ndvi), 4), location_wkt=wkt))
+        for base in range(0, n_months, batch):
+            offsets = ee.List.sequence(base, min(base + batch, n_months) - 1)
+            fc = ee.FeatureCollection(offsets.map(monthly_feature))
+            data = self._get_info(fc)
+            for feat in data.get("features", []):
+                props = feat.get("properties", {})
+                ndvi = props.get("ndvi")
+                if ndvi is None:  # fully-clouded / empty month
+                    continue
+                d = datetime.strptime(props["date"], "%Y-%m-%d").replace(tzinfo=start.tzinfo)
+                records.append(SatelliteRecord(date=d, ndvi=round(float(ndvi), 4), location_wkt=wkt))
         return records
