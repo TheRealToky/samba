@@ -54,11 +54,11 @@ def ingest_observations_task(region_id: int, start_iso: str, end_iso: str, limit
         return IngestionService(db).ingest_observations(region, _parse(start_iso), _parse(end_iso), limit)
 
 
-def ingest_region_all(region_id: int, start_iso: str, end_iso: str) -> dict:
+def ingest_region_all(region_id: int, start_iso: str, end_iso: str, limit: int | None = None) -> dict:
     return {
         "satellite": ingest_satellite_task(region_id, start_iso, end_iso),
         "climate": ingest_climate_task(region_id, start_iso, end_iso),
-        "observations": ingest_observations_task(region_id, start_iso, end_iso),
+        "observations": ingest_observations_task(region_id, start_iso, end_iso, limit),
     }
 
 
@@ -77,13 +77,13 @@ def train_models_task() -> dict:
     return {"status": "trained"}
 
 
-def ingest_all(start_iso: str, end_iso: str) -> dict:
+def ingest_all(start_iso: str, end_iso: str, limit: int | None = None) -> dict:
     """Synchronous full ingestion across every region (used by the demo button)."""
     totals = {"satellite": 0, "climate": 0, "observations": 0, "regions": 0}
     with SessionLocal() as db:
         region_ids = list(db.execute(select(Region.id)).scalars().all())
     for rid in region_ids:
-        result = ingest_region_all(rid, start_iso, end_iso)
+        result = ingest_region_all(rid, start_iso, end_iso, limit)
         for k, v in result.items():
             totals[k] += v
         totals["regions"] += 1

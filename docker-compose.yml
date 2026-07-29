@@ -93,6 +93,7 @@ services:
     image: samba-backend
     env_file: .env
     command: ["python", "-m", "app.workers.worker"]
+    restart: unless-stopped
     depends_on:
       api:
         condition: service_started

@@ -43,16 +43,16 @@ def run_ingestion(payload: IngestionRequest, db: Session = Depends(get_db)) -> J
     if payload.run_async:
         queue = get_queue()
         if region_id is not None:
-            job = queue.enqueue(tasks.ingest_region_all, region_id, start_iso, end_iso)
+            job = queue.enqueue(tasks.ingest_region_all, region_id, start_iso, end_iso, payload.limit)
         else:
-            job = queue.enqueue(tasks.ingest_all, start_iso, end_iso, job_timeout=1800)
+            job = queue.enqueue(tasks.ingest_all, start_iso, end_iso, payload.limit, job_timeout=1800)
         return JobRef(job_id=job.id, status="queued", detail="Ingestion job enqueued")
 
     # inline (blocking) — handy for quick demos / tests
     if region_id is not None:
-        result = tasks.ingest_region_all(region_id, start_iso, end_iso)
+        result = tasks.ingest_region_all(region_id, start_iso, end_iso, payload.limit)
     else:
-        result = tasks.ingest_all(start_iso, end_iso)
+        result = tasks.ingest_all(start_iso, end_iso, payload.limit)
     return JobRef(job_id=None, status="finished", detail="Ingestion ran inline", result=result)
 
 
