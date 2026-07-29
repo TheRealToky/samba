@@ -36,6 +36,11 @@ class Settings(BaseSettings):
     ingestion_mode_biodiversity: str | None = None
     # Max occurrences to pull per region per run in live biodiversity ingestion.
     biodiversity_max_records: int = 500
+    # How far back iNaturalist is pulled within the ingestion window. iNaturalist
+    # overlaps GBIF's aggregate, so it's clipped to the recent tail to limit
+    # double-counting; widen this to broaden community/photo coverage. 0 (or less)
+    # removes the clip entirely and pulls the full window.
+    biodiversity_inat_recent_days: int = 365
 
     # ML (Phase 3)
     model_dir: str = "/models"

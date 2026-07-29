@@ -2,8 +2,9 @@
 
 Both read APIs are auth-free. A composite provider merges them: GBIF is the
 canonical bulk source (it already aggregates iNaturalist research-grade records),
-and iNaturalist is pulled *recent-only* to feed the community/photo use case
-while keeping overlap — and therefore double-counting — small.
+and iNaturalist is pulled from the recent tail of the window (width set by
+`settings.biodiversity_inat_recent_days`; 0 = full window) to feed the
+community/photo use case while keeping overlap — and double-counting — bounded.
 
 Live pulls paginate up to `limit` records/region and set a descriptive
 User-Agent (iNaturalist requests one). Conservation status / endemism are left
@@ -16,6 +17,7 @@ from datetime import datetime, timedelta
 
 import httpx
 
+from app.config import settings
 from app.ingestion.base import ObservationRecord
 from app.ingestion.sampling import sample_observations
 
@@ -27,9 +29,6 @@ _USER_AGENT = "SAMBA/0.1 (Madagascar biodiversity monitoring; +https://github.co
 _GBIF_PAGE = 300
 _INAT_PAGE = 200
 _INAT_MAX_OFFSET = 10_000
-# Only pull iNaturalist observations from the recent tail of the window to limit
-# overlap with GBIF's aggregate.
-_INAT_RECENT_DAYS = 90
 
 
 def _get_json(client: httpx.Client, url: str, params: dict, retries: int = 3) -> dict:
@@ -106,8 +105,9 @@ class INaturalistProvider:
         if bbox is None:
             return []
         lon_min, lat_min, lon_max, lat_max = bbox
-        # Recent tail only (see module docstring).
-        d1 = max(start, end - timedelta(days=_INAT_RECENT_DAYS))
+        # Recent tail only (see module docstring); configurable, 0 = full window.
+        recent_days = settings.biodiversity_inat_recent_days
+        d1 = start if recent_days <= 0 else max(start, end - timedelta(days=recent_days))
         out: list[ObservationRecord] = []
         page = 1
         with httpx.Client(timeout=60, headers={"User-Agent": _USER_AGENT}) as client:
