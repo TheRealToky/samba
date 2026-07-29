@@ -26,3 +26,7 @@ statsmodels==0.14.4
 reportlab==4.2.5
 boto3==1.35.90
 pytest==8.3.4
+# Live satellite (INGESTION_MODE_SATELLITE=live) only — lazily imported, so
+# sample/climate/biodiversity runs don't need it. Range-pinned because Earth
+# Engine ships frequently; pin exactly once you've locked a working build.
+earthengine-api>=1.4,<2

@@ -7,17 +7,18 @@ from app.ingestion.climate import NasaPowerClimateProvider
 from app.ingestion.satellite import EarthEngineSatelliteProvider
 
 
-def _mode() -> str:
-    return "live" if settings.ingestion_mode.lower() == "live" else "sample"
+def _mode(override: str | None) -> str:
+    value = (override or settings.ingestion_mode).lower()
+    return "live" if value == "live" else "sample"
 
 
 def get_satellite_provider() -> EarthEngineSatelliteProvider:
-    return EarthEngineSatelliteProvider(mode=_mode())
+    return EarthEngineSatelliteProvider(mode=_mode(settings.ingestion_mode_satellite))
 
 
 def get_climate_provider() -> NasaPowerClimateProvider:
-    return NasaPowerClimateProvider(mode=_mode())
+    return NasaPowerClimateProvider(mode=_mode(settings.ingestion_mode_climate))
 
 
 def get_biodiversity_provider() -> CompositeBiodiversityProvider:
-    return CompositeBiodiversityProvider(mode=_mode())
+    return CompositeBiodiversityProvider(mode=_mode(settings.ingestion_mode_biodiversity))

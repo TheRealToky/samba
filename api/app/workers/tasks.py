@@ -41,7 +41,12 @@ def ingest_climate_task(region_id: int, start_iso: str, end_iso: str) -> int:
         return IngestionService(db).ingest_climate(region, _parse(start_iso), _parse(end_iso))
 
 
-def ingest_observations_task(region_id: int, start_iso: str, end_iso: str, limit: int = 40) -> int:
+def ingest_observations_task(region_id: int, start_iso: str, end_iso: str, limit: int | None = None) -> int:
+    from app.config import settings
+
+    if limit is None:
+        # Live pulls paginate up to this cap; sample ingestion caps at 40 internally.
+        limit = settings.biodiversity_max_records
     with SessionLocal() as db:
         region = db.get(Region, region_id)
         if region is None:

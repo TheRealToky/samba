@@ -28,6 +28,14 @@ class Settings(BaseSettings):
     gee_project: str = ""
     # "sample" = deterministic synthetic data (no network/creds); "live" = real APIs.
     ingestion_mode: str = "sample"
+    # Per-source overrides (None = fall back to ingestion_mode). Lets the auth-free
+    # sources (climate/biodiversity) run live while satellite stays on sample until
+    # Earth Engine credentials are configured.
+    ingestion_mode_satellite: str | None = None
+    ingestion_mode_climate: str | None = None
+    ingestion_mode_biodiversity: str | None = None
+    # Max occurrences to pull per region per run in live biodiversity ingestion.
+    biodiversity_max_records: int = 500
 
     # ML (Phase 3)
     model_dir: str = "/models"

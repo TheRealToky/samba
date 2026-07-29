@@ -4,11 +4,15 @@ Live mode derives a scalar mean NDVI per region per month from Sentinel-2 via
 `reduceRegion` — matching the SatelliteData.ndvi shape. It requires a GEE-
 registered GCP project and a service-account key (GEE_* settings); the import is
 lazy so the earthengine-api package is only needed for live mode.
+
+The whole monthly series is computed server-side and pulled in a single
+`getInfo()` round trip (rather than one call per month) to cut latency and stay
+well under Earth Engine's request quotas.
 """
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from app.config import settings
 from app.ingestion.base import SatelliteRecord
@@ -42,33 +46,43 @@ class EarthEngineSatelliteProvider:
         return ee
 
     def _fetch_live(self, region: dict, start: datetime, end: datetime) -> list[SatelliteRecord]:
+        bbox = region.get("bbox")
+        if bbox is None:  # custom region without geometry — nothing to clip against
+            return []
         ee = self._init_ee()
-        lon_min, lat_min, lon_max, lat_max = region["bbox"]
+        lon_min, lat_min, lon_max, lat_max = bbox
         geom = ee.Geometry.Rectangle([lon_min, lat_min, lon_max, lat_max])
-        wkt = bbox_polygon_wkt(tuple(region["bbox"]))
+        wkt = bbox_polygon_wkt(tuple(bbox))
 
-        def with_ndvi(img):
-            return img.addBands(img.normalizedDifference(["B8", "B4"]).rename("NDVI"))
+        n_months = (end.year - start.year) * 12 + (end.month - start.month) + 1
+        start_month = ee.Date.fromYMD(start.year, start.month, 1)
+        s2 = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
 
-        records: list[SatelliteRecord] = []
-        cursor = datetime(start.year, start.month, 1, tzinfo=start.tzinfo)
-        while cursor <= end:
-            nxt = (cursor.replace(day=28) + timedelta(days=8)).replace(day=1)
+        def monthly_feature(offset):
+            offset = ee.Number(offset)
+            d0 = start_month.advance(offset, "month")
+            d1 = d0.advance(1, "month")
             col = (
-                ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
-                .filterBounds(geom)
-                .filterDate(cursor.strftime("%Y-%m-%d"), nxt.strftime("%Y-%m-%d"))
+                s2.filterBounds(geom)
+                .filterDate(d0, d1)
                 .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 40))
-                .map(with_ndvi)
+                .map(lambda img: img.normalizedDifference(["B8", "B4"]).rename("NDVI"))
             )
-            composite = col.select("NDVI").median()
-            value = composite.reduceRegion(
+            mean = col.median().reduceRegion(
                 reducer=ee.Reducer.mean(), geometry=geom, scale=250, maxPixels=1e9
             ).get("NDVI")
-            ndvi = value.getInfo() if value is not None else None
-            if ndvi is not None:
-                records.append(
-                    SatelliteRecord(date=cursor, ndvi=round(float(ndvi), 4), location_wkt=wkt)
-                )
-            cursor = nxt
+            return ee.Feature(None, {"date": d0.format("YYYY-MM-dd"), "ndvi": mean})
+
+        months = ee.List.sequence(0, n_months - 1)
+        fc = ee.FeatureCollection(months.map(monthly_feature))
+        data = fc.getInfo()  # single round trip for the whole series
+
+        records: list[SatelliteRecord] = []
+        for feat in data.get("features", []):
+            props = feat.get("properties", {})
+            ndvi = props.get("ndvi")
+            if ndvi is None:  # fully-clouded / empty month
+                continue
+            d = datetime.strptime(props["date"], "%Y-%m-%d").replace(tzinfo=start.tzinfo)
+            records.append(SatelliteRecord(date=d, ndvi=round(float(ndvi), 4), location_wkt=wkt))
         return records
