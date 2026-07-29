@@ -1,14 +1,14 @@
 """Integration test: sample ingestion -> query -> alignment (DB-backed)."""
 from __future__ import annotations
 
+import json
 from datetime import datetime, timezone
 
 import pytest
-from geoalchemy2.elements import WKTElement
 from sqlalchemy import func, select
 
 from app.db import SessionLocal
-from app.geo.madagascar import REGIONS, bbox_polygon_wkt
+from app.geo.madagascar import REGIONS
 from app.ingestion.service import IngestionService
 from app.models.environmental import ClimateData, SatelliteData
 from app.models.region import Region
@@ -24,7 +24,9 @@ def region_id() -> int:
             spec = next(r for r in REGIONS if r["code"] == "MENABE")
             region = Region(
                 code=spec["code"], name=spec["name"], biome=spec["biome"],
-                geom=WKTElement(bbox_polygon_wkt(tuple(spec["bbox"])), srid=4326),
+                geom=func.ST_Multi(
+                    func.ST_SetSRID(func.ST_GeomFromGeoJSON(json.dumps(spec["geometry"])), 4326)
+                ),
             )
             db.add(region)
             db.commit()
