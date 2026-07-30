@@ -24,6 +24,15 @@ web/.vite/
 
 # Data / artifacts
 data/
+# ...except the region boundaries. `data/` matches at any depth and was silently
+# swallowing this, so clones (and therefore Docker builds) shipped without it and
+# alembic revision 0002_regions died at import with FileNotFoundError. It is a
+# build artifact of scripts/build_regions_geojson.py, but built offline — commit
+# it so image builds don't depend on fetching boundary data.
+# The directory must be re-included first: git will not descend into an excluded
+# directory, so a negation on the file alone has no effect.
+!api/app/geo/data/
+!api/app/geo/data/*.geojson
 *.tif
 *.tiff
 *.geotiff
