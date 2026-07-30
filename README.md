@@ -64,6 +64,18 @@ cp .env.example .env        # set a real JWT_SECRET before any non-local use
 docker compose up -d --build
 ```
 
+> **Windows: `api` exits immediately with `set: Illegal option -`?**
+> Your working tree has CRLF line endings, which `sh` can't run. Fresh clones are
+> fine — this only hits trees checked out before `.gitattributes` was added, since
+> Git rewrites line endings only when a file's content actually changes.
+> `git status` looks clean either way (Git normalizes on read, so it cannot see
+> the problem). Renormalize the tree, then rebuild without the cached layer:
+>
+> ```bash
+> git rm --cached -rq . && git reset --hard
+> docker compose build --no-cache api && docker compose up -d
+> ```
+
 The `api` service runs migrations on startup (PostGIS + all tables + spatial
 indexes + region seed). Then:
 
