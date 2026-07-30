@@ -4,6 +4,7 @@ from __future__ import annotations
 from app.config import settings
 from app.ingestion.biodiversity import CompositeBiodiversityProvider
 from app.ingestion.climate import NasaPowerClimateProvider
+from app.ingestion.enrichment import GBIFIucnEnricher
 from app.ingestion.satellite import EarthEngineSatelliteProvider
 
 
@@ -22,3 +23,8 @@ def get_climate_provider() -> NasaPowerClimateProvider:
 
 def get_biodiversity_provider() -> CompositeBiodiversityProvider:
     return CompositeBiodiversityProvider(mode=_mode(settings.ingestion_mode_biodiversity))
+
+
+def get_iucn_enricher() -> GBIFIucnEnricher:
+    # Auth-free default; swap for an IUCN-Red-List-API enricher here later.
+    return GBIFIucnEnricher()

@@ -46,6 +46,10 @@ class Settings(BaseSettings):
     # double-counting; widen this to broaden community/photo coverage. 0 (or less)
     # removes the clip entirely and pulls the full window.
     biodiversity_inat_recent_days: int = 365
+    # IUCN Red List enrichment (Stage 3): after a full live ingestion, fill
+    # Species.conservation_status via GBIF's IUCN category endpoint (auth-free).
+    # Disable to skip the extra GBIF calls.
+    iucn_enrichment_enabled: bool = True
 
     # ML (Phase 3)
     model_dir: str = "/models"
