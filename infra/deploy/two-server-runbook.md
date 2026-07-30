@@ -53,7 +53,26 @@ Nothing in `/etc/nginx/nginx.conf`, `sites-enabled/default`, or
 
 ## 0. Before you start
 
-On **both** app servers, confirm the ports SAMBA wants are actually free:
+On **both** app servers, check the CPU architecture:
+
+```bash
+uname -m
+```
+
+If it reports `aarch64` (AWS Graviton — t4g/m7g/c7g), set `POSTGIS_IMAGE` in
+`.env` before starting anything:
+
+```bash
+POSTGIS_IMAGE=imresamu/postgis:16-3.4
+```
+
+The official `postgis/postgis` images are published for **amd64 only** — every
+tag, alpine included — so on ARM the container exits immediately with
+`exec format error` and everything that depends on it fails to start. Redis,
+MinIO and the locally-built app images are unaffected, so postgis is the only
+service that shows this.
+
+Then confirm the ports SAMBA wants are actually free:
 
 ```bash
 sudo ss -ltnp | grep -E ':(8090|5432|6379|9000|9001)\b' || echo "all free"
