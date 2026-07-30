@@ -7,8 +7,8 @@ import { IconAlertCircle, IconEye, IconEyeOff } from "../components/icons";
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("ds@example.com");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -87,8 +87,6 @@ export default function Login() {
         <button className="auth-submit" disabled={busy}>
           {busy ? "Signing in…" : "Sign in"}
         </button>
-
-        <p className="auth-note">Demo: ds@example.com / password123 (data scientist)</p>
       </form>
     </AuthShell>
   );
