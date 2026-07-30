@@ -162,6 +162,30 @@ export const IconArrowRight = make(
 
 export const IconChevronDown = make(<path d="m6 9 6 6 6-6" />);
 
+export const IconEye = make(
+  <>
+    <path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0" />
+    <circle cx="12" cy="12" r="3" />
+  </>
+);
+
+export const IconEyeOff = make(
+  <>
+    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c4.64 0 8.09 3.3 9.94 6.65a1 1 0 0 1 0 .7 15.9 15.9 0 0 1-1.7 2.6" />
+    <path d="M6.6 6.6A15.9 15.9 0 0 0 2.06 11.65a1 1 0 0 0 0 .7C3.91 15.7 7.36 19 12 19a10.4 10.4 0 0 0 5.4-1.6" />
+    <path d="m14.1 14.1a3 3 0 0 1-4.2-4.2" />
+    <path d="m2 2 20 20" />
+  </>
+);
+
+export const IconAlertCircle = make(
+  <>
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 8v4" />
+    <path d="M12 16h.01" />
+  </>
+);
+
 export const IconBarChart = make(
   <>
     <path d="M3 3v16a2 2 0 0 0 2 2h16" />

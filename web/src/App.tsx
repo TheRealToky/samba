@@ -4,6 +4,7 @@ import { useAuth } from "./auth";
 import Layout from "./components/Layout";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 // The authenticated pages pull in MapLibre and the heavier chart views. Loading
 // them lazily keeps the public landing page's first paint off that payload.
@@ -27,6 +28,7 @@ export default function App() {
       {/* Public marketing surface */}
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
       <Route
         element={
           <Protected>

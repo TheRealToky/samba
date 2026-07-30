@@ -287,22 +287,4 @@ select {
 .callout .ico { display: inline-flex; color: #b45309; flex: none; margin-top: 1px; }
 .big-number { font-size: 34px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
 
-/* ---------- Login ---------- */
-.login-wrap {
-  display: grid; place-content: center; justify-items: center; gap: 18px; min-height: 100vh;
-  background: var(--green-900);
-}
-.login-back {
-  display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
-  color: rgba(255, 255, 255, 0.72); font-size: 13px; font-weight: 600;
-}
-.login-back:hover { color: #fff; }
-.login-card { background: #fff; padding: 34px; border-radius: var(--radius-lg); width: 372px; box-shadow: var(--shadow-lg); }
-.login-brand { display: flex; align-items: center; gap: 11px; margin-bottom: 4px; }
-.login-brand .mark { width: 40px; height: 40px; border-radius: 10px; background: var(--green-100); color: var(--green-600); display: grid; place-items: center; }
-.login-card h1 { margin: 0; color: var(--green); font-size: 24px; }
-.login-card .tag { margin: 2px 0 22px; color: var(--muted); font-size: 12.5px; }
-.field { margin-bottom: 14px; }
-.field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
-.field input { width: 100%; padding: 11px 12px; border: 1px solid var(--border-strong); border-radius: 9px; font-size: 14px; }
-.field input:focus { outline: none; border-color: var(--green-500); box-shadow: 0 0 0 3px rgba(58, 154, 69, 0.15); }
+/* Sign in / sign up live in src/auth.css (loaded by components/AuthShell). */

@@ -1,13 +1,15 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
-import { IconArrowRight, IconLeaf } from "../components/icons";
+import AuthShell from "../components/AuthShell";
+import { IconAlertCircle, IconEye, IconEyeOff } from "../components/icons";
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("ds@example.com");
   const [password, setPassword] = useState("password123");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -26,32 +28,68 @@ export default function Login() {
   }
 
   return (
-    <div className="login-wrap">
-      <form className="login-card" onSubmit={onSubmit}>
-        <div className="login-brand">
-          <span className="mark"><IconLeaf size={20} /></span>
-          <h1>SAMBA</h1>
+    <AuthShell
+      title="Welcome back"
+      subtitle="Sign in to your monitoring workspace."
+      highlights={[
+        "Live deforestation, climate and biodiversity layers",
+        "Alerts ranked by severity, with acknowledgement tracking",
+        "CSV and PDF exports you can hand to funders",
+      ]}
+      footer={
+        <>
+          Don't have an account? <Link to="/signup">Create one free</Link>
+        </>
+      }
+    >
+      <form className="auth-form" onSubmit={onSubmit}>
+        {error && (
+          <div className="auth-alert" role="alert">
+            <span className="auth-alert-icon"><IconAlertCircle size={15} /></span>
+            <span>{error}</span>
+          </div>
+        )}
+
+        <div className="auth-field">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            required
+          />
         </div>
-        <p className="tag">Madagascar's environmental intelligence hub — deforestation, climate &amp; biodiversity.</p>
-        {error && <div className="error">{error}</div>}
-        <div className="field">
-          <label>Email</label>
-          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required />
+
+        <div className="auth-field">
+          <label htmlFor="password">Password</label>
+          <div className="auth-input-wrap">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              className="auth-reveal"
+              onClick={() => setShowPassword((s) => !s)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <IconEyeOff size={16} /> : <IconEye size={16} />}
+            </button>
+          </div>
         </div>
-        <div className="field">
-          <label>Password</label>
-          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required />
-        </div>
-        <button className="btn" style={{ width: "100%" }} disabled={busy}>
+
+        <button className="auth-submit" disabled={busy}>
           {busy ? "Signing in…" : "Sign in"}
         </button>
-        <p className="muted" style={{ marginTop: 16 }}>
-          Demo: ds@example.com / password123 (data scientist)
-        </p>
+
+        <p className="auth-note">Demo: ds@example.com / password123 (data scientist)</p>
       </form>
-      <Link className="login-back" to="/">
-        Back to the SAMBA home page <IconArrowRight size={13} />
-      </Link>
-    </div>
+    </AuthShell>
   );
 }

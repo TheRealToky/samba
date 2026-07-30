@@ -157,7 +157,7 @@ export default function Landing() {
 
   const primaryCta = user
     ? { to: "/dashboard", label: "Open your dashboard" }
-    : { to: "/login", label: "Get started free" };
+    : { to: "/signup", label: "Create your free account" };
 
   return (
     <div className="lp">
@@ -190,7 +190,7 @@ export default function Landing() {
             ) : (
               <>
                 <Link className="lp-btn lp-btn-quiet" to="/login">Sign in</Link>
-                <Link className="lp-btn lp-btn-primary" to="/login">
+                <Link className="lp-btn lp-btn-primary" to="/signup">
                   Get started <IconArrowRight size={15} />
                 </Link>
               </>
@@ -455,7 +455,7 @@ export default function Landing() {
 
         <div className="lp-wrap">
           <div className="lp-species-cta lp-reveal">
-            <Link className="lp-btn lp-btn-primary" to={user ? "/biodiversity" : "/login"}>
+            <Link className="lp-btn lp-btn-primary" to={user ? "/biodiversity" : "/signup"}>
               Explore the species atlas <IconArrowRight size={15} />
             </Link>
           </div>
@@ -563,6 +563,7 @@ export default function Landing() {
             <a href="#how">How it works</a>
             <a href="#sources">Sources</a>
             <Link to="/login">Sign in</Link>
+            <Link to="/signup">Create account</Link>
           </nav>
         </div>
         <div className="lp-wrap lp-footer-note">
