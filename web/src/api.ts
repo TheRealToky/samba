@@ -47,6 +47,49 @@ export const api = {
     }),
 };
 
+export interface RegisteredUser {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
+/** Self-registration. The backend always assigns the default (least-privileged)
+ *  role and returns the new user — not a token, so callers log in afterwards. */
+export async function register(name: string, email: string, password: string): Promise<RegisteredUser> {
+  const res = await fetch("/api/v1/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password }),
+  });
+  if (!res.ok) throw new RegistrationError(res.status, await readDetail(res));
+  return res.json();
+}
+
+/** Carries the HTTP status so the form can react to 409 (email taken) etc. */
+export class RegistrationError extends Error {
+  constructor(public status: number, message: string) {
+    super(message);
+    this.name = "RegistrationError";
+  }
+}
+
+/** FastAPI returns `detail` as a string, or a list of validation objects. */
+async function readDetail(res: Response): Promise<string> {
+  try {
+    const { detail } = await res.json();
+    if (typeof detail === "string") return detail;
+    if (Array.isArray(detail) && detail.length) {
+      const first = detail[0];
+      const field = Array.isArray(first?.loc) ? first.loc[first.loc.length - 1] : null;
+      return field ? `${field}: ${first.msg}` : String(first?.msg ?? res.statusText);
+    }
+  } catch {
+    /* fall through to the status text */
+  }
+  return res.statusText || "Registration failed";
+}
+
 export async function login(email: string, password: string): Promise<string> {
   const form = new URLSearchParams({ username: email, password });
   const res = await fetch("/api/v1/auth/login", {

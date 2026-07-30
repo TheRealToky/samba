@@ -20,6 +20,8 @@ class Region(Base, TimestampMixin):
     code: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
     name: Mapped[str] = mapped_column(String(128), nullable=False)
     biome: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    # MultiPolygon: real administrative boundaries (islands, complex coastlines);
+    # see app/geo/madagascar.py. Was POLYGON in the bounding-box prototype.
     geom = mapped_column(
-        Geometry(geometry_type="POLYGON", srid=4326, spatial_index=True), nullable=False
+        Geometry(geometry_type="MULTIPOLYGON", srid=4326, spatial_index=True), nullable=False
     )

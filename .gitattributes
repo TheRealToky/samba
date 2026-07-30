@@ -1,0 +1,9 @@
+* text=auto eol=lf
+
+# Executed by `sh` inside Linux containers, where a stray CR is fatal. Force LF
+# instead of relying on text=auto's content sniffing.
+*.sh text eol=lf
+
+# Postgres dump — real binary content that happens to contain CR bytes. Marked
+# explicitly so no future attribute change can mangle it.
+*.dump binary

@@ -10,6 +10,12 @@ class IngestionRequest(BaseModel):
     end: date = Field(description="Inclusive end date")
     region_code: str | None = Field(default=None, description="Limit to one region; omit for all")
     run_async: bool = Field(default=True, description="Queue the job (True) or run inline (False)")
+    limit: int | None = Field(
+        default=None,
+        gt=0,
+        le=10_000,
+        description="Max biodiversity records per region per source; omit for the server default",
+    )
 
 
 class JobRef(BaseModel):

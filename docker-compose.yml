@@ -16,7 +16,10 @@
 
 services:
   postgis:
-    image: postgis/postgis:16-3.4
+    # The official postgis/postgis images are amd64-only — every tag, including
+    # the alpine ones. On an ARM host (AWS Graviton) the container dies with
+    # "exec format error". Override POSTGIS_IMAGE on those hosts; see .env.example.
+    image: ${POSTGIS_IMAGE:-postgis/postgis:16-3.4}
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -93,6 +96,7 @@ services:
     image: samba-backend
     env_file: .env
     command: ["python", "-m", "app.workers.worker"]
+    restart: unless-stopped
     depends_on:
       api:
         condition: service_started

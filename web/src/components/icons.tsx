@@ -153,6 +153,89 @@ export const IconTrendFlat = make(<path d="M5 12h14" />);
 
 export const IconCheck = make(<path d="M20 6 9 17l-5-5" />);
 
+export const IconArrowRight = make(
+  <>
+    <path d="M5 12h14" />
+    <path d="m12 5 7 7-7 7" />
+  </>
+);
+
+export const IconChevronDown = make(<path d="m6 9 6 6 6-6" />);
+
+export const IconEye = make(
+  <>
+    <path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0" />
+    <circle cx="12" cy="12" r="3" />
+  </>
+);
+
+export const IconEyeOff = make(
+  <>
+    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c4.64 0 8.09 3.3 9.94 6.65a1 1 0 0 1 0 .7 15.9 15.9 0 0 1-1.7 2.6" />
+    <path d="M6.6 6.6A15.9 15.9 0 0 0 2.06 11.65a1 1 0 0 0 0 .7C3.91 15.7 7.36 19 12 19a10.4 10.4 0 0 0 5.4-1.6" />
+    <path d="m14.1 14.1a3 3 0 0 1-4.2-4.2" />
+    <path d="m2 2 20 20" />
+  </>
+);
+
+export const IconAlertCircle = make(
+  <>
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 8v4" />
+    <path d="M12 16h.01" />
+  </>
+);
+
+export const IconBarChart = make(
+  <>
+    <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+    <path d="M18 17V9" />
+    <path d="M13 17V5" />
+    <path d="M8 17v-3" />
+  </>
+);
+
+export const IconFileText = make(
+  <>
+    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+    <path d="M14 2v5h6" />
+    <path d="M9 13h6" />
+    <path d="M9 17h4" />
+  </>
+);
+
+export const IconLayers = make(
+  <>
+    <path d="m12 2 9 5-9 5-9-5 9-5Z" />
+    <path d="m3 12 9 5 9-5" />
+    <path d="m3 17 9 5 9-5" />
+  </>
+);
+
+export const IconUsers = make(
+  <>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </>
+);
+
+export const IconShield = make(
+  <>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+    <path d="m9 12 2 2 4-4" />
+  </>
+);
+
+export const IconCpu = make(
+  <>
+    <rect x="4" y="4" width="16" height="16" rx="2" />
+    <rect x="9" y="9" width="6" height="6" />
+    <path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2" />
+  </>
+);
+
 /** Icon for a species group used in leaderboards and photo-tile fallbacks. */
 export function TaxonIcon({ group, size }: { group: string; size?: number }) {
   switch (group) {

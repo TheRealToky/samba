@@ -34,6 +34,14 @@ for i in $(seq 1 6); do curl -s localhost:8000/health | jq -r .instance; done
 `infra/nginx/lb.conf` round-robins across replicas via the Docker DNS resolver;
 in cloud this is a managed L7 load balancer instead.
 
+## 2b. Running on two app servers behind HAProxy
+
+For the VM-based deployment (two app servers + an HAProxy load balancer, sharing
+the boxes with pre-existing apps), see
+[infra/deploy/two-server-runbook.md](infra/deploy/two-server-runbook.md). It
+covers the port allocation that avoids the existing services, the split of the
+data tier onto one server, and the additive nginx/HAProxy configuration.
+
 ## 3. Security (NFR-1)
 
 - **TLS/HTTPS everywhere**: terminate TLS at the cloud load balancer (managed

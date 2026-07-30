@@ -1,0 +1,27 @@
+# Overlay that mounts the Google Earth Engine service-account key for LIVE
+# satellite ingestion. The base docker-compose.yml intentionally omits it so a
+# default (sample-mode) run needs no credentials.
+#
+# 1. Put your key at ./secrets/gee-service-account.json  (the secrets/ dir is
+#    git-ignored, so the key never lands in version control).
+# 2. In .env set:  INGESTION_MODE_SATELLITE=live  and  GEE_PROJECT=<your-ee-project>
+# 3. Bring the stack up with both files:
+#      docker compose -f docker-compose.yml -f docker-compose.gee.yml up -d --build
+#
+# Compose mounts the secret at /run/secrets/gee-service-account.json, which is
+# what GEE_SERVICE_ACCOUNT_JSON points to in .env.example. It's attached to the
+# services that can run ingestion (api = inline runs, worker = queued jobs).
+
+services:
+  api:
+    secrets:
+      - source: gee-service-account
+        target: gee-service-account.json
+  worker:
+    secrets:
+      - source: gee-service-account
+        target: gee-service-account.json
+
+secrets:
+  gee-service-account:
+    file: ./secrets/gee-service-account.json

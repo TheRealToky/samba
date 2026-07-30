@@ -1,0 +1,35 @@
+# Production overlay — applied on BOTH app servers, on top of docker-compose.yml.
+#
+#   web-01:  docker compose -f docker-compose.yml -f docker-compose.prod.yml \
+#                           -f docker-compose.data.yml up -d
+#   web-02:  docker compose -f docker-compose.yml -f docker-compose.prod.yml \
+#                           -f docker-compose.apponly.yml up -d
+#
+# Port policy on these hosts (see infra/deploy/two-server-runbook.md):
+#   :80    already owned by the pre-existing rwanda-risk-alert vhost
+#   :8000  already proxied to by that vhost
+#   :8080  already owned by the pre-existing static site
+# So SAMBA publishes exactly one host port, 8090, and only on loopback. The
+# host's nginx (infra/nginx/samba.conf) is the sole entry point; HAProxy talks
+# to that, never to the container directly.
+
+services:
+  api:
+    # No host port. The web container reaches the API over the compose network,
+    # and host :8000 is spoken for by the pre-existing app — binding it here
+    # would silently hijack that app's upstream.
+    ports: !override []
+    restart: unless-stopped
+
+  worker:
+    restart: unless-stopped
+
+  inference:
+    # Reached in-network via INFERENCE_URL; nothing off-host needs it.
+    ports: !override []
+    restart: unless-stopped
+
+  web:
+    ports: !override
+      - "127.0.0.1:${SAMBA_WEB_PORT:-8090}:80"
+    restart: unless-stopped
