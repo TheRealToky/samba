@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import { api } from "../api";
 import { IUCN_COLOR, IUCN_LABEL, speciesMeta, statusKey } from "../lib/species";
 

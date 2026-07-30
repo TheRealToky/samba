@@ -37,6 +37,8 @@ def _get_json(client: httpx.Client, url: str, params: dict, retries: int = 3) ->
         try:
             resp = client.get(url, params=params)
             resp.raise_for_status()
+            if not resp.content:  # 204 No Content (e.g. GBIF: taxon has no IUCN record)
+                return {}
             return resp.json()
         except (httpx.TransportError, httpx.HTTPStatusError) as exc:
             if attempt == retries - 1:

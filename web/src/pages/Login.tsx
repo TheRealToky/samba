@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
-import { IconLeaf } from "../components/icons";
+import { IconArrowRight, IconLeaf } from "../components/icons";
 
 export default function Login() {
   const { login } = useAuth();
@@ -17,7 +17,7 @@ export default function Login() {
     setError(null);
     try {
       await login(email, password);
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -49,6 +49,9 @@ export default function Login() {
           Demo: ds@example.com / password123 (data scientist)
         </p>
       </form>
+      <Link className="login-back" to="/">
+        Back to the SAMBA home page <IconArrowRight size={13} />
+      </Link>
     </div>
   );
 }

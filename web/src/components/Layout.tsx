@@ -1,9 +1,9 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../auth";
 import { IconLeaf } from "./icons";
 
 const links = [
-  { to: "/", label: "Overview", end: true },
+  { to: "/dashboard", label: "Overview", end: true },
   { to: "/biodiversity", label: "Biodiversity" },
   { to: "/climate", label: "Climate" },
   { to: "/map", label: "Map" },
@@ -16,13 +16,13 @@ export default function Layout() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <div className="brand">
+        <Link className="brand" to="/" title="Back to the public site">
           <span className="brand-mark"><IconLeaf size={18} /></span>
           <span className="brand-text">
             SAMBA
             <span className="brand-sub">Madagascar Environmental Hub</span>
           </span>
-        </div>
+        </Link>
         <nav className="nav">
           {links.map((l) => (
             <NavLink key={l.to} to={l.to} end={l.end} className={({ isActive }) => (isActive ? "active" : "")}>
