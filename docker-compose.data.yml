@@ -1,0 +1,26 @@
+# web-01 ONLY — the shared data tier.
+#
+# PostGIS, Redis and MinIO cannot be duplicated per server: two copies behind a
+# round-robin load balancer means users see different data depending on which
+# replica they land on. web-01 owns them; web-02 connects over the private network.
+#
+# These publish on the PRIVATE interface only. Do not bind them to 0.0.0.0:
+# Redis ships with no authentication at all, and Postgres/MinIO would be
+# reachable from the internet. Set DATA_BIND_IP to web-01's private IP in .env.
+
+services:
+  postgis:
+    ports: !override
+      - "${DATA_BIND_IP}:5432:5432"
+    restart: unless-stopped
+
+  redis:
+    ports: !override
+      - "${DATA_BIND_IP}:6379:6379"
+    restart: unless-stopped
+
+  minio:
+    ports: !override
+      - "${DATA_BIND_IP}:9000:9000"   # S3 API — web-02 needs this
+      - "127.0.0.1:9001:9001"         # console — local/tunnel only
+    restart: unless-stopped

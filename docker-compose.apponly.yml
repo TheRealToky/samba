@@ -1,0 +1,36 @@
+# web-02 ONLY — stateless app tier.
+#
+# The data tier lives on web-01, so the local postgis/redis/minio containers are
+# parked behind an unused profile rather than started. Point the app at web-01
+# via .env (DATABASE_URL, REDIS_URL, MINIO_ENDPOINT -> web-01's private IP).
+#
+# `depends_on` is cleared throughout: it references the now-disabled services,
+# and the `service_healthy` conditions would otherwise block startup forever.
+
+services:
+  # Assigning a profile that is never enabled keeps these defined (so the
+  # base file stays valid) but stops compose from ever starting them here.
+  postgis:
+    profiles: ["unused-on-this-host"]
+  redis:
+    profiles: ["unused-on-this-host"]
+  minio:
+    profiles: ["unused-on-this-host"]
+  createbuckets:
+    profiles: ["unused-on-this-host"]
+
+  api:
+    depends_on: !override []
+    environment:
+      # web-01 is the designated migrator; concurrent `alembic upgrade head`
+      # against the shared database races on the version table.
+      RUN_MIGRATIONS: "false"
+
+  worker:
+    depends_on: !override []
+
+  inference:
+    depends_on: !override []
+
+  web:
+    depends_on: !override []
