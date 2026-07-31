@@ -124,6 +124,11 @@ services:
 
   web:
     build: ./web
+    # Named explicitly (like samba-backend above) rather than left to compose's
+    # <project>-<service> default, so the tag is stable no matter what directory
+    # or -p the host uses. That is what makes `docker save`/`load` a usable
+    # deploy path for servers too small to run the vite build themselves.
+    image: samba-web
     ports:
       - "8080:80"
     depends_on:
