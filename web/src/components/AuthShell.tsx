@@ -42,11 +42,6 @@ export default function AuthShell({
   return (
     <div className="auth">
       <aside className="auth-aside">
-        <div className="auth-aside-bg" aria-hidden="true">
-          <span className="auth-orb auth-orb-1" />
-          <span className="auth-orb auth-orb-2" />
-        </div>
-
         <Link to="/" className="auth-brand">
           <span className="auth-brand-mark"><IconLeaf size={18} /></span>
           <span className="auth-brand-text">

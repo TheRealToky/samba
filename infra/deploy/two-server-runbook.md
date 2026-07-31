@@ -213,6 +213,41 @@ The existing app must still answer on its own hostname throughout.
 
 ---
 
+## Deploying an update
+
+Both app servers are built independently, so **deploy them from the same commit,
+back to back** — never one host today and the other tomorrow.
+
+```bash
+# on each host, in turn
+cd /opt/samba && git fetch && git checkout <same commit on both>
+# web-01
+docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.data.yml up -d --build
+# web-02
+docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.apponly.yml up -d --build
+```
+
+Then confirm both replicas are serving the *same* frontend build — this is the
+one thing round-robin cannot tolerate being different:
+
+```bash
+for i in $(seq 1 8); do curl -s http://samba.<domain>/ | grep -o 'index-[A-Za-z0-9_-]*\.js'; done | sort -u
+```
+
+Exactly one line must come back. Two lines means the replicas disagree: each
+serves an `index.html` naming hashed chunks the other does not have, and every
+browser that draws chunk requests from both hosts gets a broken lazy route.
+`web/Dockerfile` pins this with `npm ci` against the committed lockfile, so the
+same commit always produces the same hashes — a mismatch here means the hosts
+are on different commits.
+
+If a CDN sits in front, **purge it after the deploy**. A missing chunk used to
+be answered with `index.html` under a 200, which CDNs cache happily; `/assets/`
+now returns a real 404 so that cannot recur, but anything cached before the fix
+must be evicted by hand.
+
+---
+
 ## Rollback
 
 ```bash

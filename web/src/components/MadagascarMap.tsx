@@ -59,31 +59,6 @@ export default function MadagascarMap({ signals }: { signals: RegionSignal[] }) 
         aria-label="Map of Madagascar's regions shaded by recent vegetation loss"
         onMouseLeave={() => setHover(null)}
       >
-        <defs>
-          <radialGradient id="lp-halo" cx="50%" cy="45%" r="60%">
-            <stop offset="0%" stopColor="#5eead4" stopOpacity="0.22" />
-            <stop offset="100%" stopColor="#5eead4" stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id="lp-scan" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#a7f3d0" stopOpacity="0" />
-            <stop offset="55%" stopColor="#a7f3d0" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#a7f3d0" stopOpacity="0" />
-          </linearGradient>
-          <clipPath id="lp-island">
-            {REGION_SHAPES.map((r) => (
-              <path key={r.code} d={r.d} />
-            ))}
-          </clipPath>
-        </defs>
-
-        <ellipse
-          cx={MAP_VIEWBOX.w / 2}
-          cy={MAP_VIEWBOX.h / 2}
-          rx={MAP_VIEWBOX.w * 0.8}
-          ry={MAP_VIEWBOX.h * 0.55}
-          fill="url(#lp-halo)"
-        />
-
         <g className="lp-map-regions">
           {REGION_SHAPES.map((r) => {
             const band = bandFor(loss(byName.get(r.name)));
@@ -109,18 +84,6 @@ export default function MadagascarMap({ signals }: { signals: RegionSignal[] }) 
               </path>
             );
           })}
-        </g>
-
-        {/* Satellite sweep — pure decoration, clipped to the island. */}
-        <g clipPath="url(#lp-island)">
-          <rect
-            className="lp-map-scan"
-            x={-10}
-            y={-70}
-            width={MAP_VIEWBOX.w + 20}
-            height={70}
-            fill="url(#lp-scan)"
-          />
         </g>
 
         {hotspots.map(({ shape }) => (

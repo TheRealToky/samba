@@ -3,8 +3,10 @@
    .lp / .lp-* so nothing here can leak into the authenticated app shell. */
 
 .lp {
-  --lp-ink: #081c11;
-  --lp-ink-2: #0e2a1a;
+  /* Flat surfaces — no gradients. Both a touch lighter than the old ink so the
+     dark sections read as one calm colour instead of a wash. */
+  --lp-ink: #0f2c1c;
+  --lp-ink-2: #133622;
   --lp-max: 1180px;
   --lp-nav-h: 68px;
   background: var(--panel);
@@ -22,7 +24,7 @@
   transition: background 0.25s ease, box-shadow 0.25s ease, backdrop-filter 0.25s ease;
 }
 .lp-nav.on {
-  background: rgba(8, 28, 17, 0.82);
+  background: rgba(15, 44, 28, 0.85);
   backdrop-filter: blur(12px);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 30px rgba(6, 20, 12, 0.28);
 }
@@ -33,8 +35,8 @@
 .lp-brand { display: flex; align-items: center; gap: 11px; text-decoration: none; color: #fff; flex: none; }
 .lp-brand-mark {
   width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; flex: none;
-  background: linear-gradient(140deg, #2e7d32, #16543a);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22), 0 6px 16px rgba(20, 70, 40, 0.4);
+  background: #2e7d32;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
   color: #eafff1;
 }
 .lp-brand-text { display: flex; flex-direction: column; line-height: 1.1; font-weight: 800; font-size: 17px; }
@@ -64,10 +66,10 @@
 .lp-btn:active { transform: translateY(1px); }
 .lp-btn-lg { padding: 13px 24px; font-size: 15px; border-radius: 12px; }
 .lp-btn-primary {
-  background: linear-gradient(140deg, #3a9a45, #1f7a35);
-  color: #fff; box-shadow: 0 8px 22px rgba(31, 122, 53, 0.32);
+  background: #3a9a45;
+  color: #fff;
 }
-.lp-btn-primary:hover { box-shadow: 0 12px 28px rgba(31, 122, 53, 0.42); transform: translateY(-1px); }
+.lp-btn-primary:hover { background: #43ab4f; transform: translateY(-1px); }
 .lp-btn-quiet { color: rgba(255, 255, 255, 0.88); background: rgba(255, 255, 255, 0.09); }
 .lp-btn-quiet:hover { background: rgba(255, 255, 255, 0.18); color: #fff; }
 .lp-btn-outline { color: #fff; border-color: rgba(255, 255, 255, 0.42); background: rgba(255, 255, 255, 0.04); }
@@ -77,31 +79,8 @@
 .lp-hero {
   position: relative; overflow: hidden; isolation: isolate;
   padding: calc(var(--lp-nav-h) + 54px) 0 96px;
-  background:
-    radial-gradient(1100px 620px at 78% -10%, #1c6a44 0%, transparent 62%),
-    linear-gradient(168deg, #0b2517 0%, var(--lp-ink) 46%, #071a10 100%);
+  background: var(--lp-ink);
   color: #fff;
-}
-.lp-hero-bg { position: absolute; inset: 0; z-index: -1; }
-.lp-orb {
-  position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.4;
-  animation: lp-drift 22s ease-in-out infinite;
-}
-.lp-orb-1 { width: 480px; height: 480px; left: -120px; top: 4%; background: #1d7a4e; }
-.lp-orb-2 { width: 420px; height: 420px; right: 4%; top: 34%; background: #0f766e; animation-delay: -7s; }
-.lp-orb-3 { width: 360px; height: 360px; left: 38%; bottom: -14%; background: #3f7d24; animation-delay: -14s; }
-@keyframes lp-drift {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  33% { transform: translate3d(34px, -26px, 0) scale(1.08); }
-  66% { transform: translate3d(-24px, 20px, 0) scale(0.95); }
-}
-/* Faint contour texture so the flat gradient reads as terrain. */
-.lp-grain {
-  position: absolute; inset: 0; opacity: 0.5;
-  background-image:
-    repeating-linear-gradient(115deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 46px),
-    repeating-linear-gradient(58deg, rgba(255,255,255,0.028) 0 1px, transparent 1px 64px);
-  mask-image: radial-gradient(80% 70% at 50% 40%, #000 0%, transparent 100%);
 }
 
 .lp-hero-inner {
@@ -127,11 +106,7 @@
 .lp-hero h1 {
   font-size: clamp(34px, 4.3vw, 52px); line-height: 1.06; font-weight: 800; margin: 20px 0 18px;
 }
-.lp-hero h1 em {
-  display: block; font-style: normal;
-  background: linear-gradient(96deg, #7ee2a8 8%, #d9f99d 52%, #fbbf24 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
+.lp-hero h1 em { display: block; font-style: normal; color: #7ee2a8; }
 .lp-hero-copy > p { font-size: clamp(15px, 1.35vw, 17.5px); line-height: 1.6; color: rgba(255, 255, 255, 0.8); }
 .lp-hero-actions { display: flex; gap: 12px; margin: 28px 0 34px; flex-wrap: wrap; }
 .lp-hero-stats { display: flex; gap: 34px; flex-wrap: wrap; padding-top: 26px; border-top: 1px solid rgba(255, 255, 255, 0.14); }
@@ -159,8 +134,6 @@
   height: min(60vh, 600px); overflow: visible;
 }
 .lp-map-regions path { transition: fill-opacity 0.18s ease, stroke-width 0.18s ease; cursor: crosshair; }
-.lp-map-scan { animation: lp-sweep 7.5s linear infinite; }
-@keyframes lp-sweep { from { transform: translateY(0); } to { transform: translateY(700px); } }
 .lp-map-ping {
   fill: none; stroke: #fff; stroke-width: 1.4;
   transform-box: fill-box; transform-origin: center;
@@ -210,8 +183,8 @@
 /* Smooth anchor jumps, scoped to pages that actually render the landing tree. */
 html:has(.lp) { scroll-behavior: smooth; }
 .lp-section { padding: 96px 0; scroll-margin-top: var(--lp-nav-h); }
-.lp-section-tint { background: linear-gradient(180deg, var(--green-050), var(--bg)); }
-.lp-section-dark { background: linear-gradient(170deg, #0d2b1b, #071a10); color: #fff; }
+.lp-section-tint { background: var(--green-050); }
+.lp-section-dark { background: var(--lp-ink); color: #fff; }
 .lp-head { max-width: 700px; margin: 0 auto 52px; text-align: center; }
 .lp-eyebrow {
   display: inline-block; text-transform: uppercase; letter-spacing: 0.15em;
@@ -346,9 +319,7 @@ html:has(.lp) { scroll-behavior: smooth; }
 /* ---------------------------------------------------------- final cta --- */
 .lp-cta {
   padding: 80px 0;
-  background:
-    radial-gradient(700px 320px at 20% 0%, rgba(46, 125, 50, 0.55) 0%, transparent 70%),
-    linear-gradient(150deg, #0f3722, var(--lp-ink));
+  background: var(--lp-ink-2);
   color: #fff;
 }
 .lp-cta-inner { display: flex; align-items: center; justify-content: space-between; gap: 36px; flex-wrap: wrap; }
@@ -381,7 +352,7 @@ html:has(.lp) { scroll-behavior: smooth; }
   .lp-nav-links { display: none; }
   .lp-nav-links.open {
     display: flex; flex-direction: column; position: absolute; top: var(--lp-nav-h); left: 12px; right: 12px;
-    background: rgba(8, 28, 17, 0.97); border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(15, 44, 28, 0.97); border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 12px; padding: 10px; gap: 2px; backdrop-filter: blur(10px);
   }
   .lp-burger { display: flex; }

@@ -209,13 +209,6 @@ export default function Landing() {
 
       {/* ---------------------------------------------------------- hero --- */}
       <section className="lp-hero">
-        <div className="lp-hero-bg" aria-hidden="true">
-          <span className="lp-orb lp-orb-1" />
-          <span className="lp-orb lp-orb-2" />
-          <span className="lp-orb lp-orb-3" />
-          <div className="lp-grain" />
-        </div>
-
         <div className="lp-hero-inner">
           <div className="lp-hero-copy">
             <span className="lp-pill">

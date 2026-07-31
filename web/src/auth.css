@@ -2,7 +2,8 @@
    namespaced under .auth-* so it can't reach the authenticated app shell. */
 
 .auth {
-  --auth-ink: #081c11;
+  /* Flat surface, a touch lighter than the old ink — matches the landing page. */
+  --auth-ink: #0f2c1c;
   min-height: 100vh;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
@@ -15,20 +16,14 @@
   position: relative; isolation: isolate; overflow: hidden;
   display: flex; flex-direction: column; justify-content: space-between;
   padding: 40px 44px; color: #fff;
-  background:
-    radial-gradient(760px 420px at 22% -8%, #1c6a44 0%, transparent 62%),
-    linear-gradient(168deg, #0b2517 0%, var(--auth-ink) 52%, #071a10 100%);
+  background: var(--auth-ink);
 }
-.auth-aside-bg { position: absolute; inset: 0; z-index: -1; }
-.auth-orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.42; }
-.auth-orb-1 { width: 400px; height: 400px; left: -110px; top: 8%; background: #1d7a4e; }
-.auth-orb-2 { width: 330px; height: 330px; right: -80px; bottom: 4%; background: #0f766e; }
 
 .auth-brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; color: #fff; align-self: flex-start; }
 .auth-brand-mark {
   width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; flex: none;
-  background: linear-gradient(140deg, #2e7d32, #16543a); color: #eafff1;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22), 0 6px 16px rgba(20, 70, 40, 0.4);
+  background: #2e7d32; color: #eafff1;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
 }
 .auth-brand-text { display: flex; flex-direction: column; line-height: 1.1; font-weight: 800; font-size: 17px; }
 .auth-brand-text span { font-size: 10.5px; font-weight: 500; opacity: 0.7; letter-spacing: 0.02em; }
@@ -129,13 +124,13 @@
 /* Submit ------------------------------------------------------------------ */
 .auth-submit {
   margin-top: 4px; width: 100%; padding: 13px 20px; border: 0; border-radius: 11px;
-  background: linear-gradient(140deg, #3a9a45, #1f7a35); color: #fff;
-  font-size: 15px; font-weight: 700; box-shadow: 0 8px 22px rgba(31, 122, 53, 0.3);
-  transition: transform 0.12s ease, box-shadow 0.18s ease, opacity 0.15s ease;
+  background: #3a9a45; color: #fff;
+  font-size: 15px; font-weight: 700;
+  transition: transform 0.12s ease, background 0.18s ease, opacity 0.15s ease;
 }
-.auth-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(31, 122, 53, 0.4); }
+.auth-submit:hover:not(:disabled) { transform: translateY(-1px); background: #43ab4f; }
 .auth-submit:active:not(:disabled) { transform: translateY(1px); }
-.auth-submit:disabled { opacity: 0.6; cursor: default; box-shadow: none; }
+.auth-submit:disabled { opacity: 0.6; cursor: default; }
 
 .auth-note { margin: 2px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 .auth-alt { font-size: 13.5px; color: var(--muted); }
